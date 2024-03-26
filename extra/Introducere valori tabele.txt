@@ -1,0 +1,15 @@
+INSERT INTO utilizatori
+VALUES('Admin', 'Niță', 'Daniel-Marius', 'dan@gmail.com', 'proiect@BD', NULL),
+('Manager', 'Ionescu', 'Laurențiu', 'laur@gmail.com', 'laur', NULL),
+('Utilizator', 'Dumitrescu', 'Sorin', 'sorin@gmail.com', 'sorin', NULL),
+('Utilizator', 'Hodor', 'Liviu', 'liviu@gmail.com', 'liviu', 'București'),
+('Utilizator', 'Scărlătescu', 'Cosmin', 'cosmin@gmail.com', 'cosmin', NULL);
+
+INSERT INTO medicamente
+VALUES(NULL, 'Xyzal', 'Imagini\xyzal.jpg', 'Antihistanimic', '5g, 30 comprimate filmate', 'Orală', 'la liber', 21.49, 500, 'AESICA PHARMACEUTICALS S.R.L.', 'Prospecte\xyzal.txt', '2027-06-28'),
+(NULL, 'Serum pentru față cu retinol' 'Imagini\retinol_revox, 'Serum',  '50ml', 'Piele', 'la liber', 20.00, 200, 'Revox', 'Prospecte/revox.txt','2024-12-31');
+INSERT INTO Medicamente (PromotieID, Denumire, Imagine, Categorie, Forma, TipAdministrare, TipEliberare, Pret, Stoc, Distribuitor, Prospect, DataExpirare)
+VALUES 
+(NULL, 'Paracetamol', 'Imagini/paracetamol.jpg', 'Analgezic', '500 mg, 20 comprimate', 'Orală', 'la liber', 5.99, 200, 'Pharma Company', 'Prospecte/paracetamol.txt', '2024-12-31'),
+(NULL, 'Ibuprofen', 'Imagini/ibuprofen.jpg', 'Antiinflamator', '400 mg, 30 capsule', 'Orală', 'la liber', 7.49, 150, 'Medicine Distributor', 'Prospecte/ibuprofen.txt', '2023-10-15'),
+(NULL, 'Omeprazol', 'Imagini/omeprazol.jpg', 'Antiulceros', '20 mg, 14 comprimate', 'Orală', 'cu rețetă', 15.99, 100, 'Pharmaceuticals Ltd', 'Prospecte/omeprazol.txt', '2025-06-20');

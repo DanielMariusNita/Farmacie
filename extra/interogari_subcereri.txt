@@ -1,0 +1,37 @@
+INTEROGĂRI COMPLEXE
+
+1. Produsul cu cel mai mare rating per categorie
+SELECT m.Categorie, m.Denumire, MAX(AverageRating) AS HighestAverageRating
+FROM medicamente m
+LEFT JOIN (
+    SELECT MedicamentID, AVG(NumarStele) AS AverageRating
+    FROM recenzii
+    GROUP BY MedicamentID
+) AS subquery ON m.MedicamentID = subquery.MedicamentID
+GROUP BY m.Categorie, m.Denumire;
+
+2.  Utilizatori care au dat cel mai mare număr de stele în total pentru fiecare medicament
+SELECT r.MedicamentID, u.Nume, u.Prenume, SUM(r.NumarStele) AS TotalStele
+FROM recenzii r
+JOIN utilizatori u ON r.UtilizatorID = u.UtilizatorID
+WHERE r.NumarStele = (SELECT MAX(NumarStele) FROM recenzii WHERE MedicamentID = r.MedicamentID)
+GROUP BY r.MedicamentID, u.UtilizatorID;
+
+3. Facturile comenzilor pentru produsul cel mai cumparat din ultimul an
+SELECT f.FacturaID, c.UtilizatorID, c.DataComanda, m.Denumire AS MedicamentCumparat
+FROM facturi f
+JOIN comenzi c ON f.ComandaID = c.ComandaID
+JOIN medicamentecomenzi mc ON c.ComandaID = mc.ComandaID
+JOIN medicamente m ON mc.MedicamentID = m.MedicamentID
+WHERE c.DataComanda >= NOW() - INTERVAL 1 YEAR
+AND mc.MedicamentID = (
+    SELECT MedicamentID
+    FROM (
+        SELECT MedicamentID, SUM(NumarBucati) AS TotalBucatiVandute
+        FROM medicamentecomenzi
+        GROUP BY MedicamentID
+        ORDER BY TotalBucatiVandute DESC
+        LIMIT 1
+    ) AS subquery
+)
+ORDER BY c.DataComanda DESC;

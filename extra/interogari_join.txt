@@ -1,0 +1,65 @@
+INTEROGĂRI SIMPLE
+
+1. Numar Bucăți Vândute Pentru fiecare Categorie
+SELECT m.Categorie, SUM(mc.NumarBucati) AS TotalBucatiVandute
+FROM medicamente m
+JOIN medicamentecomenzi mc ON m.MedicamentID = mc.MedicamentID
+JOIN comenzi co ON mc.ComandaID = co.ComandaID
+GROUP BY m.Categorie
+
+
+2.Utilizatorii care au creat mai multe liste favorite si numarul de medicamente
+SELECT u.Nume, u.Prenume, lf.NumeLista, COUNT(mf.MedicamentID) AS NumMedicinesInList
+FROM utilizatori u
+JOIN listefavorite lf ON u.UtilizatorID = lf.UtilizatorID
+LEFT JOIN medicamentefavorite mf ON lf.ListaID = mf.ListaID
+GROUP BY u.UtilizatorID, lf.ListaID
+HAVING COUNT(lf.ListaID) > 1;
+
+3.  Cele mai bine vândute 2 produse, aflate la reducere
+    SELECT m.Denumire, m.Pret, p.ProcentReducere,
+           m.Pret - (m.Pret * p.ProcentReducere / 100) AS PretRedus,
+           SUM(mc.NumarBucati) AS TotalBucatiVandute
+    FROM medicamente m
+    JOIN promotii p ON m.PromotieID = p.PromotieID
+    LEFT JOIN medicamentecomenzi mc ON m.MedicamentID = mc.MedicamentID
+    LEFT JOIN recenzii r ON m.MedicamentID = r.MedicamentID
+    ORDER BY TotalBucatiVandute DESC
+    LIMIT 2;
+
+4. Afisarea medicamentelor favorite pentru un utilizator
+SELECT lf.NumeLista, m.Denumire, m.Imagine, m.Categorie, m.Forma, m.TipAdministrare, m.TipEliberare, m.Pret, m.Stoc, m.Distribuitor, m.Prospect, m.DataExpirare
+        FROM listefavorite lf
+        JOIN medicamentefavorite mf ON lf.ListaID = mf.ListaID
+        JOIN medicamente m ON mf.MedicamentID = m.MedicamentID
+        WHERE lf.UtilizatorID = $utilizatorID
+
+5. Afisare medicamente dint-o comanda aleasa de admin in functie de seria si numarul facturii.
+SELECT m.Denumire, m.Categorie, m.Forma, m.Pret
+FROM medicamente m
+JOIN medicamentecomenzi mc ON m.MedicamentID = mc.MedicamentID
+JOIN comenzi c ON c.ComandaID=mc.ComandaID
+JOIN facturi f ON f.ComandaID=c.ComandaID
+WHERE f.Serie=? AND f.Numar=? 
+GROUP BY m.Denumire
+
+6. Afiseaza cate produse si-au comandat fiecare utilizator din medicamentele favorite fiecaruia
+SELECT u.Nume, u.Prenume, COUNT(mc.MedicamentID) AS NumarProduseComandate
+FROM utilizatori u
+JOIN listefavorite lf ON u.UtilizatorID = lf.UtilizatorID
+JOIN medicamentefavorite mf ON lf.ListaID = mf.ListaID
+JOIN medicamentecomenzi mc ON mf.MedicamentID = mc.MedicamentID
+GROUP BY u.UtilizatorID, u.Nume, u.Prenume;
+
+7.
+SELECT u.UtilizatorID, u.Nume, u.Prenume, COUNT(lf.ListaID) AS NumarAparitiiInListe
+FROM utilizatori u
+JOIN medicamentefavorite mf ON u.UtilizatorID = mf.UtilizatorID
+JOIN listefavorite lf ON mf.ListaID = lf.ListaID
+JOIN medicamente m ON mf.MedicamentID = m.MedicamentID
+JOIN medicamentecomenzi mc ON m.MedicamentID = mc.MedicamentID
+JOIN comenzi c ON mc.ComandaID = c.ComandaID
+WHERE m.Denumire = 'Paracetamol'
+GROUP BY u.UtilizatorID, u.Nume, u.Prenume
+HAVING COUNT(DISTINCT c.ComandaID) >= 3;
+

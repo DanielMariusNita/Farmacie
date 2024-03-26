@@ -1,0 +1,87 @@
+CREATE DATABASE IF NOT EXISTS Farmacie;
+
+CREATE TABLE Utilizatori(
+    UtilizatorID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    Rol char(10) DEFAULT 'Utilizator' NOT NULL,
+    Nume varchar(50) NOT NULL,
+    Prenume varchar(50) NOT NULL,
+    Email varchar(50) NOT NULL UNIQUE,
+    Parola varchar(50) NOT NULL,
+    Domiciliu varchar(100)
+);
+
+CREATE TABLE Promotii(
+    PromotieID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    DataStart datetime DEFAULT CURRENT_TIMESTAMP,
+    DataTerminare datetime NOT NULL,
+    ProcentReducere tinyint NOT NULL CHECK(ProcentReducere>0 AND ProcentReducere<=100),
+    CONSTRAINT check_date CHECK (DataTerminare > DataStart)
+);
+
+CREATE TABLE Comenzi(
+    ComandaID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    UtilizatorID int,
+    DataComanda datetime NOT NULL,
+    TipLivrare char(20) NOT NULL CHECK(TipLivrare='ridicare din farmacie' OR TipLivrare='livrare la domiciliu'),
+    TipPlata char(7) NOT NULL CHECK(TipPlata='online' OR TipPlata='ramburs'),
+    FOREIGN KEY (UtilizatorID) REFERENCES Utilizatori(UtilizatorID) ON DELETE NO ACTION
+);
+
+CREATE TABLE Facturi(
+    FacturaID int AUTO_INCREMENT PRIMARY KEY,
+    ComandaID int NOT NULL,
+    Serie char(4) NOT NULL,
+    Numar bigint NOT NULL,
+    FOREIGN KEY (ComandaID) REFERENCES Comenzi(ComandaID) ON DELETE CASCADE
+);
+
+CREATE TABLE ListeFavorite(
+    ListaID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    UtilizatorID int,
+    NumeLista varchar(50) NOT NULL,
+    FOREIGN KEY (UtilizatorID) REFERENCES Utilizatori(UtilizatorID) ON DELETE CASCADE
+);
+
+CREATE TABLE Medicamente(
+    MedicamentID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    PromotieID int,
+    Denumire varchar(50) NOT NULL,
+    Imagine char(50) NOT NULL,
+    Categorie char(19) NOT NULL,
+    TipAdministrare char(10) NOT NULL,
+    TipEliberare char(20) NOT NULL CHECK(TipEliberare='la liber' OR TipEliberare='cu rețetă' OR TipEliberare='cu rețetă compensată'),
+    Pret decimal(6, 2) NOT NULL,
+    Stoc int NOT NULL DEFAULT 0,
+    Distribuitor varchar(50) NOT NULL,
+    Prospect TEXT NOT NULL,
+    DataExpirare date NOT NULL,
+    FOREIGN KEY (PromotieID) REFERENCES Promotii(PromotieID) ON DELETE SET NULL
+);
+
+CREATE TABLE MedicamenteFavorite(
+    ListaID int,
+    MedicamentID int,
+    PRIMARY KEY (ListaID, MedicamentID),
+    FOREIGN KEY (ListaID) REFERENCES ListeFavorite(ListaID) ON DELETE CASCADE,
+    FOREIGN KEY (MedicamentID) REFERENCES Medicamente(MedicamentID) ON DELETE CASCADE
+);
+
+CREATE TABLE Recenzii(
+    RecenzieID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    UtilizatorID int,
+    MedicamentID int,
+    NumarStele tinyint NOT NULL CHECK(NumarStele>0 AND NumarStele<=5),
+    Comentariu varchar(250),
+    DataRecenzie datetime NOT NULL,
+    FOREIGN KEY (UtilizatorID) REFERENCES Utilizatori(UtilizatorID) ON DELETE CASCADE,
+    FOREIGN KEY (MedicamentID) REFERENCES Medicamente(MedicamentID) ON DELETE CASCADE
+);
+
+CREATE TABLE MedicamenteComenzi(
+    MedicamentID int,
+    ComandaID int,
+    NumarBucati int DEFAULT 1 NOT NULL,
+    PRIMARY KEY (MedicamentID, ComandaID),
+    FOREIGN KEY (MedicamentID) REFERENCES Medicamente(MedicamentID) ON DELETE NO ACTION,
+    FOREIGN KEY (ComandaID) REFERENCES Comenzi(ComandaID) ON DELETE CASCADE
+);
