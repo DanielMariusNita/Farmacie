@@ -1,1 +1,1 @@
-# Farmacie
+# Farmacie - proiect realizat în PHP, HTML, CSS și JavaScript pentru a crea un site ce imită o farmacie online care este legată la o bază de date, iar manipularea si prelucrarea dtaelor se face prin SQL, atăt prin PDO cât și Mysqli.
